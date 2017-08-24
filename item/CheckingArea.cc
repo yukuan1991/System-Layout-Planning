@@ -13,5 +13,17 @@ void CheckingArea::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     Q_UNUSED (widget);
     painter->setBrush(Qt::blue);
 
-    painter->drawRect(QRectF(0, 0, itemWidth, itemHeight));
+    painter->drawRect(boundingRect());
+
+    if(objectName().isEmpty())
+    {
+        return;
+    }
+
+    const auto width = painter->fontMetrics().width(objectName());
+    const auto height = painter->fontMetrics().height();
+    const auto center = boundingRect().center();
+    auto rect = QRectF(center.x() - width / 2, center.y() - height / 2, width, height);
+
+    painter->drawText(rect, Qt::AlignCenter, objectName());
 }

@@ -17,5 +17,17 @@ void StagingArea::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     int startAngle = 90 * 16;
     int spanAngle = -180 * 16;
 
-    painter->drawChord(QRectF(0, 0, itemWidth, itemHeight), startAngle, spanAngle);
+    painter->drawChord(boundingRect(), startAngle, spanAngle);
+
+    if(objectName().isEmpty())
+    {
+        return;
+    }
+
+    const auto width = painter->fontMetrics().width(objectName());
+    const auto height = painter->fontMetrics().height();
+    const auto center = boundingRect().center();
+    auto rect = QRectF(center.x() - width / 2, center.y() - height / 2, width, height);
+
+    painter->drawText(rect, Qt::AlignCenter, objectName());
 }

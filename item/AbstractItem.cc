@@ -17,4 +17,5 @@ void AbstractItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     Q_UNUSED(widget);
     Q_UNUSED(option);
     painter->setPen(Qt::black);
+
 }
