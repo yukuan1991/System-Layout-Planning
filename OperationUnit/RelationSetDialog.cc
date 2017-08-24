@@ -32,7 +32,7 @@ QVariant RelationSetDialog::dump() const
         return {};
     }
     QVariantList relation;
-
+    QVariantList mark;
     for (int col = 0; col < model_->columnCount (); col ++)
     {
         for (int row = col + 1; row < model_->columnCount (); row ++)
@@ -47,6 +47,14 @@ QVariant RelationSetDialog::dump() const
         }
     }
 
+    for (int col = 0; col < model_->columnCount (); col ++)
+    {
+        const auto row = model_->columnCount();
+        const auto markData = model_->index(row, col).data(Qt::DisplayRole).toString();
+        const auto sortData = model_->index(row + 1, col).data(Qt::DisplayRole).toString();
+        mark.push_back(markData + " " + sortData);
+    }
+
     const auto model = ui->operationUnitForm->model (); assert (model);
 
     QVariantList operationList;
@@ -58,10 +66,9 @@ QVariant RelationSetDialog::dump() const
         operationList.append (map);
     }
 
-//    for()
-
     QVariantMap totalMap;
     totalMap ["relation"] = relation;
+    totalMap ["mark"] = mark;
     totalMap ["operations"] = operationList;
 
     return totalMap;
@@ -279,5 +286,26 @@ bool RelationSetDialog::checkDataPadding()
     }
 
     return true;
+}
+
+QVariant RelationSetDialog::cellMark(int col) const
+{
+    const auto row = model_->columnCount();
+    const auto index = model_->index(row, col);
+    return model_->data(index, Qt::DisplayRole);
+}
+
+QVariant RelationSetDialog::cellRank(int col) const
+{
+    const auto row = model_->columnCount() + 1;
+    const auto index = model_->index(row, col);
+    return model_->data(index, Qt::DisplayRole);
+}
+
+QVariant RelationSetDialog::cellType(int row) const
+{
+    const auto model = ui->operationUnitForm->model();
+    const auto index = model->index(row, 1);
+    return model->data(index, Qt::DisplayRole);
 }
 

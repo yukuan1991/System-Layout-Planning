@@ -22,6 +22,9 @@ public:
     QVariant dump() const;
     bool load(const QVariantMap& data);
 
+    QVariant cellMark(int col) const;
+    QVariant cellRank(int col) const;
+    QVariant cellType(int row) const;
 private:
     void setTable(int rows, int cols);
     void initConn();

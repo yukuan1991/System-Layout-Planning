@@ -2,6 +2,7 @@
 #define CANVASWIDGET_H
 
 #include <QWidget>
+#include "item/AbstractItem.h"
 
 namespace Ui {
 class CanvasWidget;
@@ -18,6 +19,13 @@ public:
     void relationSetDlgExec();
     QVariant dump() const;
     bool load(const QVariant& data);
+
+    QVariant cellMark(int col) const;
+    QVariant cellRank(int col) const;
+    QVariant cellType(int row) const;
+private:
+    void initConn();
+    void selectionChanaged(AbstractItem* item);
 private:
     Ui::CanvasWidget *ui;
 };

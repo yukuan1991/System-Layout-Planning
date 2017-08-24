@@ -53,7 +53,8 @@ SOURCES += main.cc\
     OperationUnit/OperationUnitDelegate.cc \
     OperationUnit/OperationUnitModel.cc \
     OperationUnit/CanvasWidget.cc \
-    OperationUnit/MarkWidget.cc
+    OperationUnit/MarkWidget.cc \
+    OperationUnit/AttributeWidget.cc
 
 HEADERS  += OperationUnitRelationMain.h \
     OperationUnit/Ribbon.h \
@@ -81,13 +82,15 @@ HEADERS  += OperationUnitRelationMain.h \
     OperationUnit/OperationUnitDelegate.h \
     OperationUnit/OperationUnitModel.h \
     OperationUnit/CanvasWidget.h \
-    OperationUnit/MarkWidget.h
+    OperationUnit/MarkWidget.h \
+    OperationUnit/AttributeWidget.h
 
 FORMS    += operationunitrelationmain.ui \
     OperationUnit/operationunitrelationanalysis.ui \
     OperationUnit/relationsetdialog.ui \
     OperationUnit/canvaswidget.ui \
-    OperationUnit/markwidget.ui
+    OperationUnit/markwidget.ui \
+    OperationUnit/attributewidget.ui
 
 LIBS += -lboost_filesystem
 LIBS += -lboost_system

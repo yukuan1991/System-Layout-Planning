@@ -61,142 +61,11 @@ QVariant CanvasView::dump() const
 			map["x"] = item->x();
 			map["y"] = item->y();
 			itemList.append(map);
-//			if(dynamic_cast<AssemblyArea*>(item))
-//			{
-//				QVariantMap map;
-//				map["name"] = item->objectName();
-//				map["type"] = "装配区";
-//				map["x"] = item->x();
-//				map["y"] = item->y();
-//				itemList.append(map);
-//			}
-//			else if(dynamic_cast<CheckingArea*>(item))
-//			{
-//				QVariantMap map;
-//				map["name"] = item->objectName();
-//				map["type"] = "检验、测试区域";
-//				map["x"] = item->x();
-//				map["y"] = item->y();
-//				itemList.append(map);
-//			}
-//			else if(dynamic_cast<OfficeArea*>(item))
-//			{
-//				QVariantMap map;
-//				map["name"] = item->objectName();
-//				map["type"] = "办公室规划面积";
-//				map["x"] = item->x();
-//				map["y"] = item->y();
-//				itemList.append(map);
-//			}
-//			else if(dynamic_cast<ProcessingZone*>(item))
-//			{
-//				QVariantMap map;
-//				map["name"] = item->objectName();
-//				map["type"] = "成型或处理加工区";
-//				map["x"] = item->x();
-//				map["y"] = item->y();
-//				itemList.append(map);
-//			}
-//			else if(dynamic_cast<ServiceArea*>(item))
-//			{
-//				QVariantMap map;
-//				map["name"] = item->objectName();
-//				map["type"] = "服务及辅助作业区域";
-//				map["x"] = item->x();
-//				map["y"] = item->y();
-//				itemList.append(map);
-//			}
-//			else if(dynamic_cast<StagingArea*>(item))
-//			{
-//				QVariantMap map;
-//				map["name"] = item->objectName();
-//				map["type"] = "停放或暂存区域";
-//				map["x"] = item->x();
-//				map["y"] = item->y();
-//				itemList.append(map);
-//			}
-//			else if(dynamic_cast<StorageArea*>(item))
-//			{
-//				QVariantMap map;
-//				map["name"] = item->objectName();
-//				map["type"] = "储存作业区域";
-//				map["x"] = item->x();
-//				map["y"] = item->y();
-//				itemList.append(map);
-//			}
-//			else if(dynamic_cast<TransportArea*>(item))
-//			{
-//				QVariantMap map;
-//				map["name"] = item->objectName();
-//				map["type"] = "与运输有关的作业区域";
-//				map["x"] = item->x();
-//				map["y"] = item->y();
-//				itemList.append(map);
-//			}
 		}
 	}
 
-//	QVariantList lineList;
-//	for(auto & it : items)
-//	{
-//		if(auto line = dynamic_cast<AbstractLine*>(it))
-//		{
-//			if(dynamic_cast<LineA*>(line))
-//			{
-//				QVariantMap map;
-//				map["start x"] = line->start().x();
-//				map["start y"] = line->start().y();
-//				map["stop x"] = line->stop().x();
-//				map["stop y"] = line->stop().y();
-//				map["type"] = 'A';
-//				lineList.append(map);
-//			}
-//			else if(dynamic_cast<LineE*>(line))
-//			{
-//				QVariantMap map;
-//				map["start x"] = line->start().x();
-//				map["start y"] = line->start().y();
-//				map["stop x"] = line->stop().x();
-//				map["stop y"] = line->stop().y();
-//				map["type"] = 'E';
-//				lineList.append(map);
-//			}
-//			else if(dynamic_cast<LineI*>(line))
-//			{
-//				QVariantMap map;
-//				map["start x"] = line->start().x();
-//				map["start y"] = line->start().y();
-//				map["stop x"] = line->stop().x();
-//				map["stop y"] = line->stop().y();
-//				map["type"] = 'I';
-//				lineList.append(map);
-//			}
-//			else if(dynamic_cast<LineO*>(line))
-//			{
-//				QVariantMap map;
-//				map["start x"] = line->start().x();
-//				map["start y"] = line->start().y();
-//				map["stop x"] = line->stop().x();
-//				map["stop y"] = line->stop().y();
-//				map["type"] = 'O';
-//				lineList.append(map);
-//			}
-//			else if(dynamic_cast<LineX*>(line))
-//			{
-//				QVariantMap map;
-//				map["start x"] = line->start().x();
-//				map["start y"] = line->start().y();
-//				map["stop x"] = line->stop().x();
-//				map["stop y"] = line->stop().y();
-//				map["type"] = 'X';
-//				lineList.append(map);
-//			}
-//		}
-//	}
-
 	QVariantMap canvasMap;
 	canvasMap["items"] = itemList;
-//	canvasMap["lines"] = lineList;
 
 	QVariantMap totalMap;
 	totalMap["charts"] = chartsMap;
@@ -228,7 +97,15 @@ void CanvasView::init()
     this->setScene(ptr_scene);
     setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 
-    setRenderHints (QPainter::Antialiasing);
+	setRenderHints (QPainter::Antialiasing);
+
+	initConn();
+}
+
+void CanvasView::initConn()
+{
+	connect (scene_.get (), &CanvasScene::selectionChanged,
+	                                                 this, &CanvasView::onSelectedChanged);
 }
 
 void CanvasView::generateChart(const QVariantMap & data)
@@ -405,5 +282,43 @@ AbstractLine *CanvasView::makeLine(not_null<AbstractItem *> p1, not_null<Abstrac
 	scene ()->addItem (line);
     }
 
-    return line;
+	return line;
+}
+
+void CanvasView::onSelectedChanged()
+{
+	qDebug() << "CanvasView::onSelectedChanged";
+	const auto items = scene_->selectedItems();
+	QList<AbstractItem*> selectedItems;
+	for(auto & it : items)
+	{
+		if(auto item = dynamic_cast<AbstractItem*>(it))
+		{
+			selectedItems.push_back(item);
+		}
+	}
+
+	if(selectedItems.size() == 1)
+	{
+		emit selectionChanged(selectedItems.at(0));
+	}
+	else
+	{
+		emit selectionChanged(nullptr);
+	}
+}
+
+QVariant CanvasView::cellMark(int col) const
+{
+	return relationSetDlg_.cellMark(col);
+}
+
+QVariant CanvasView::cellRank(int col) const
+{
+	return relationSetDlg_.cellRank(col);
+}
+
+QVariant CanvasView::cellType(int row) const
+{
+	return relationSetDlg_.cellType(row);
 }
