@@ -1,6 +1,8 @@
 ﻿#include "MarkWidget.h"
 #include "ui_markwidget.h"
 
+#include <QDebug>
+
 MarkWidget::MarkWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::MarkWidget)
@@ -15,5 +17,6 @@ MarkWidget::~MarkWidget()
 
 void MarkWidget::setMark(qreal mark)
 {
+    qDebug() << "MarkWidget::setMark:" << mark;
     ui->labelMark->setText(QString::number(mark));
 }

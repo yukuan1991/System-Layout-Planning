@@ -30,7 +30,7 @@ using namespace boost;
 
 CanvasView::~CanvasView()
 {
-
+	disconnect (selection_conn_);
 }
 
 void CanvasView::relationSetDlgExec()
@@ -76,12 +76,13 @@ QVariant CanvasView::dump() const
 
 bool CanvasView::load(const QVariant &data)
 {
-	qDebug() << "CanvasView::load";
 	const auto totalMap = data.toMap();
 	if(!loadCanvas(totalMap))
 	{
 		return false;
 	}
+
+
 	if(!loadRelationSetDlg(totalMap))
 	{
 		return false;
@@ -104,22 +105,25 @@ void CanvasView::init()
 
 void CanvasView::initConn()
 {
-	connect (scene_.get (), &CanvasScene::selectionChanged,
+	selection_conn_ = connect (scene_.get (), &CanvasScene::selectionChanged,
 	                                                 this, &CanvasView::onSelectedChanged);
+
+
 }
 
 void CanvasView::generateChart(const QVariantMap & data)
 {
 	if(scene_->items().size() > 0)
 	{
-		auto itemRng = scene_->items()
+		const auto itemList = scene_->items();
+		auto itemRng = itemList
 		        | transformed([] (auto && c) { return dynamic_cast<AbstractItem *>(c); })
 		        | filtered([] (auto && c) { return c != nullptr; });
 		for(auto && item : itemRng)
 		{
 			item->deleteLater();
 		}
-		auto lineRng = scene_->items()
+		auto lineRng = itemList
 		        | transformed([] (auto && c) { return dynamic_cast<AbstractLine *>(c); })
 		        | filtered([] (auto && c) { return c != nullptr; });
 		for(auto && line : lineRng)
@@ -146,17 +150,18 @@ void CanvasView::generateChart(const QVariantMap & data)
 		makeLine (items[stringlist.at (0).toInt ()], items[stringlist.at (1).toInt ()], stringlist.at (2).toStdString ().at (0));
 	}
 
-	auto op = this->items ()
+	const auto viewList = this->items ();
+	auto op = viewList
 	        | transformed ([] (auto && c) { return dynamic_cast<AbstractItem *>(c); })
 	        | filtered ([] (auto && c) { return c != null; });
-//	auto pos = scene_->effectiveRect().center();
-//	const auto offset = QPointF(60, 60);
-//	auto i = 0;
-//	for(auto it : op)
-//	{
-//		it->setPos(pos + (offset) * i);
-//		i++;
-	//	}
+
+	auto pos = scene_->effectiveRect().center();
+
+	for(auto it : op)
+	{
+		it->setPos(pos);
+	}
+
 }
 
 bool CanvasView::loadCanvas(const QVariantMap &data)
@@ -208,38 +213,38 @@ bool CanvasView::loadRelationSetDlg(const QVariantMap &data)
 AbstractItem *CanvasView::makeItem(const QString &type)
 {
     AbstractItem * item = null;
-    if (type == "成型或处理加工区")
-    {
-	item = new ProcessingZone;
-    }
-    else if (type == "装配区")
-    {
-	item = new AssemblyArea;
-    }
-    else if (type == "与运输有关的作业区域")
-    {
-	item = new TransportArea;
-    }
-    else if (type == "储存作业区域")
-    {
-	item = new StorageArea;
-    }
-    else if (type == "停放或暂存区域")
-    {
-	item = new StagingArea;
-    }
-    else if (type == "检验、测试区域")
-    {
-	item = new CheckingArea;
-    }
-    else if ("服务及辅助作业区域" == type)
-    {
-	item = new ServiceArea;
-    }
-    else if ("办公室规划面积" == type)
-    {
-	item = new OfficeArea;
-    }
+	if (type == "成型或处理加工区")
+	{
+		item = new ProcessingZone;
+	}
+	else if (type == "装配区")
+	{
+		item = new AssemblyArea;
+	}
+	else if (type == "与运输有关的作业区域")
+	{
+		item = new TransportArea;
+	}
+	else if (type == "储存作业区域")
+	{
+		item = new StorageArea;
+	}
+	else if (type == "停放或暂存区域")
+	{
+		item = new StagingArea;
+	}
+	else if (type == "检验、测试区域")
+	{
+		item = new CheckingArea;
+	}
+	else if ("服务及辅助作业区域" == type)
+	{
+		item = new ServiceArea;
+	}
+	else if ("办公室或规划面积" == type)
+	{
+		item = new OfficeArea;
+	}
 	else
 	{
 		assert (false);
@@ -306,6 +311,26 @@ void CanvasView::onSelectedChanged()
 	{
 		emit selectionChanged(nullptr);
 	}
+}
+
+void CanvasView::operationUnitNameChanged(const QString& oldValue, const QString& newValue)
+{
+	const auto itemList = items();
+	for(auto & it : itemList)
+	{
+		if(auto item = dynamic_cast<AbstractItem*>(it))
+		{
+			if(oldValue == item->objectName())
+			{
+				item->setObjectName(newValue);
+			}
+		}
+	}
+}
+
+void CanvasView::operationUnitTypeChanged(const QString& oldValue, const QString& newValue)
+{
+
 }
 
 QVariant CanvasView::cellMark(int col) const

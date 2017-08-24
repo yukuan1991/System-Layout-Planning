@@ -38,7 +38,8 @@ void CanvasScene::init()
 
 qreal CanvasScene::calculateMark()
 {
-    auto values = items ()
+    const auto itemList = items ();
+    auto values = itemList
             /// 转换成线条
             | transformed ([] (auto && c) { return dynamic_cast<AbstractLine *>(c); })
             /// 去掉非线条的指针

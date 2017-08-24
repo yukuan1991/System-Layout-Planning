@@ -4,15 +4,15 @@
 #include <QDebug>
 
 using namespace boost;
+
 AttributeWidget::AttributeWidget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::AttributeWidget)
+    ui(new Ui::AttributeWidget),
+    name_(QString{}),
+    type_(QString{})
 {
     ui->setupUi(this);
-    QStringList stringList;
-    stringList << "" << "成型或处理加工区" << "装配区" << "与运输有关的作业区域" << "储存作业区域"
-         << "停放或暂存区域" << "检验、测试区域" << "服务及辅助作业区域" << "办公室或规划面积";
-    ui->combo->addItems(stringList);
+    init();
 }
 
 AttributeWidget::~AttributeWidget()
@@ -22,42 +22,60 @@ AttributeWidget::~AttributeWidget()
 
 void AttributeWidget::selectedItemAttribute(AbstractItem *item, const QVariant& data)
 {
-    qDebug() << "AttributeWidget::selectedItemAttribute";
-
     if(item == nullptr)
     {
-        ui->name->setText("");
-        ui->combo->setCurrentText("");
+        name_ = QString{};
+        type_ = QString{};
+        ui->name->setText(name_);
+        ui->type->setText(type_);
         ui->mark->setText("");
         ui->number->setText("");
         return;
     }
 
-    const auto name = item->objectName();
-    ui->name->setText(name);
+    name_ = item->objectName();
+
     auto totalMap = data.toMap();
     const auto canvasMap = totalMap["canvas"].toMap();
     const auto chartMap = totalMap["charts"].toMap();
 
     const auto operation = chartMap["operations"].toList ();
     const auto mark = chartMap["mark"].toList();
-    qDebug() << operation.size();
 
-
-    auto found = find_if(operation, [&] (auto && c){ return c.toMap()["name"].toString() == name; });
+    auto found = find_if(operation, [&] (auto && c){ return c.toMap()["name"].toString() == name_; });
     if(found == operation.end())
     {
         return;
     }
     const auto row = found - operation.begin();
-    qDebug() << "row:" << row;
-    const auto type = found->toMap()["type"].toString();
-    const auto list = mark.at(row).toString().split(" ");
-    qDebug() << "type" << type;
-    qDebug() << list.at(0);
-    qDebug() << list.at(1);
 
-    ui->combo->setCurrentText(type);
+    type_ = found->toMap()["type"].toString();
+    const auto list = mark.at(row).toString().split(" ");
+
+    ui->name->setText(name_);
+    ui->type->setText(type_);
     ui->mark->setText(list.at(0));
     ui->number->setText(list.at(1));
+}
+
+void AttributeWidget::init()
+{
+    initConn();
+}
+
+void AttributeWidget::initConn()
+{
+    connect(ui->buttonConfirm, &QPushButton::clicked, this, &AttributeWidget::onButtonConfirmClicked);
+}
+
+void AttributeWidget::onButtonConfirmClicked()
+{
+    const auto name = ui->name->text();
+    const auto type = ui->type->text();
+
+    if(name != name_ or type != type_)
+    {
+        emit operationUnitNameChanged(name_, name);
+        emit operationUnitTypeChanged(type_, type);
+    }
 }

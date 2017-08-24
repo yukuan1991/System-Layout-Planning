@@ -11,7 +11,8 @@ class CanvasWidget;
 class CanvasWidget : public QWidget
 {
     Q_OBJECT
-
+signals:
+    void markChanged ();
 public:
     explicit CanvasWidget(QWidget *parent = 0);
     ~CanvasWidget();
@@ -26,6 +27,8 @@ public:
 private:
     void initConn();
     void selectionChanaged(AbstractItem* item);
+    void operationUnitNameChanged(const QString& oldValue, const QString& newValue);
+    void operationUnitTypeChanged(const QString& oldValue, const QString& newValue);
 private:
     Ui::CanvasWidget *ui;
 };

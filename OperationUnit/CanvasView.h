@@ -11,6 +11,7 @@ class AbstractLine;
 
 struct scoped_connection
 {
+    scoped_connection () = default;
     scoped_connection (QMetaObject::Connection conn)
         :data_ (std::move (conn))
     {
@@ -48,6 +49,9 @@ public:
     QVariant cellMark(int col) const;
     QVariant cellRank(int col) const;
     QVariant cellType(int row) const;
+
+    void operationUnitNameChanged(const QString& oldValue, const QString& newValue);
+    void operationUnitTypeChanged(const QString& oldValue, const QString& newValue);
 private:
     void init();
     void initConn();
@@ -58,8 +62,9 @@ private:
     AbstractLine * makeLine (not_null<AbstractItem *> p1, not_null<AbstractItem*> p2, char type);
     void onSelectedChanged();
 private:
-//    scoped_connection selection_conn_ = connect (scene_.get (), &CanvasScene::selectionChanged,
-//                                                 this, &CanvasView::onSelectedChanged);
     std::unique_ptr<CanvasScene> scene_;
     RelationSetDialog relationSetDlg_;
+
+    QMetaObject::Connection selection_conn_;
+
 };
