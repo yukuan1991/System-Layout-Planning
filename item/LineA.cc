@@ -2,8 +2,6 @@
 #include <QPainter>
 #include <QDebug>
 
-
-
 LineA::LineA(AbstractItem *start, AbstractItem *stop)
     :AbstractLine (start, stop)
 {

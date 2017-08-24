@@ -309,3 +309,18 @@ QVariant RelationSetDialog::cellType(int row) const
     return model->data(index, Qt::DisplayRole);
 }
 
+void RelationSetDialog::operationUnitNameChanged(const QString &oldValue, const QString &newValue)
+{
+    auto model = ui->operationUnitForm->model();
+    auto rows = model->rowCount();
+    for(int row = 0; row < rows; row++)
+    {
+        const auto index = model->index(row, 0);
+        const auto name = model->data(index, Qt::DisplayRole).toString();
+        if(name == oldValue)
+        {
+            model->setData(index, newValue, Qt::DisplayRole);
+        }
+    }
+}
+

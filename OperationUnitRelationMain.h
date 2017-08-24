@@ -22,10 +22,12 @@ public:
 
 private:
     void initConn();
+    void setEnabled();
 private:
     void newBuild();
     void fileOpen();
     void fileSave();
+    void fileSaveAs();
 
     void relationSet();
 
@@ -33,7 +35,6 @@ private:
     CanvasWidget* activeWindow();
 private:
     Ui::OperationUnitRelationMain *ui;
-//    RelationSetDialog relationSetDlg_;
 };
 
 #endif // OPERATIONUNITRELATIONMAIN_H

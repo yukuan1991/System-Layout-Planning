@@ -25,6 +25,7 @@ public:
     QVariant cellMark(int col) const;
     QVariant cellRank(int col) const;
     QVariant cellType(int row) const;
+    void operationUnitNameChanged(const QString& oldValue, const QString& newValue);
 private:
     void setTable(int rows, int cols);
     void initConn();

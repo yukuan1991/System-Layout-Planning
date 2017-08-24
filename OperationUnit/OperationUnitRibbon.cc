@@ -22,4 +22,5 @@ OperationUnitRibbon::OperationUnitRibbon(QWidget *parent)
 void OperationUnitRibbon::initConn()
 {
     connect(relationSet, &RibbonTool::clicked, this, &OperationUnitRibbon::relationSetClicked);
+    connect(this, &OperationUnitRibbon::subwindowActive, relationSet, &RibbonTool::setEnabled);
 }

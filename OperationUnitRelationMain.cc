@@ -15,6 +15,7 @@ OperationUnitRelationMain::OperationUnitRelationMain(QWidget *parent) :
     initConn();
     ui->mdiArea->setViewMode(QMdiArea::TabbedView);
     setWindowState(Qt::WindowMaximized);
+    setEnabled();
 }
 
 OperationUnitRelationMain::~OperationUnitRelationMain()
@@ -28,8 +29,25 @@ void OperationUnitRelationMain::initConn()
     connect(ui->rib, &OperationUnitRibbon::fileOpen, this, &OperationUnitRelationMain::fileOpen);
 
     connect(ui->rib, &OperationUnitRibbon::fileSave, this, &OperationUnitRelationMain::fileSave);
+    connect(ui->rib, &OperationUnitRibbon::fileSaveAs, this, &OperationUnitRelationMain::fileSaveAs);
+    connect(ui->rib, &OperationUnitRibbon::fileExit, this, &OperationUnitRelationMain::close);
+
     connect(ui->rib, &OperationUnitRibbon::relationSetClicked,
             this, &OperationUnitRelationMain::relationSet);
+    connect(ui->mdiArea, &QMdiArea::subWindowActivated, this, &OperationUnitRelationMain::setEnabled);
+
+}
+
+void OperationUnitRelationMain::setEnabled()
+{
+    if(activeWindow())
+    {
+        emit ui->rib->subwindowActive(true);
+    }
+    else
+    {
+        emit ui->rib->subwindowActive(false);
+    }
 }
 
 void OperationUnitRelationMain::newBuild()
@@ -46,7 +64,6 @@ void OperationUnitRelationMain::fileOpen()
     }
 
     auto fileContent = file::read_all(::utf_to_sys(fileName.toStdString()).data());
-    qDebug() << (*fileContent).data();
 
     if (!fileContent)
     {
@@ -55,7 +72,7 @@ void OperationUnitRelationMain::fileOpen()
     }
     auto canvas = createWindow();
     const auto data = QJsonDocument::fromJson((*fileContent).data()).toVariant();
-//    const auto data = QVariant((*fileContent).data());
+
     if (!canvas->load (data))
     {
         QMessageBox::information(this, "打开", "打开文件失败，文件已经损坏");
@@ -72,17 +89,45 @@ void OperationUnitRelationMain::fileSave()
     {
         return;
     }
-    QString path;
-    path = QFileDialog::getSaveFileName(this, "保存", ".", "System Layout Planning File(*.slp)");
-    if(path.isEmpty())
+
+    QString path = canvas->windowTitle();
+    if(path == "未命名")
     {
-        return;
+        path = QFileDialog::getSaveFileName(this, "保存", ".", "System Layout Planning File(*.slp)");
+        if(path.isEmpty())
+        {
+            return;
+        }
+
+        canvas->setWindowTitle(path);
     }
 
     auto dumpCanvasData = canvas->dump();
     auto data = QJsonDocument::fromVariant(dumpCanvasData).toJson().toStdString();
 
+    file::write_buffer(::utf_to_sys(path.toStdString()).data(), data.data());
+}
+
+void OperationUnitRelationMain::fileSaveAs()
+{
+    auto canvas = activeWindow();
+    if(canvas == nullptr)
+    {
+        return;
+    }
+
+    auto path = QFileDialog::getSaveFileName(this, "另存为", ".", "System Layout Planning File(*.slp)");
+    if(path.isEmpty())
+    {
+        return;
+    }
+
     canvas->setWindowTitle(path);
+
+
+    auto dumpCanvasData = canvas->dump();
+    auto data = QJsonDocument::fromVariant(dumpCanvasData).toJson().toStdString();
+
     file::write_buffer(::utf_to_sys(path.toStdString()).data(), data.data());
 }
 
@@ -98,12 +143,17 @@ void OperationUnitRelationMain::relationSet()
 
 not_null<CanvasWidget*> OperationUnitRelationMain::createWindow()
 {
+    const auto list = ui->mdiArea->subWindowList();
+
     auto canvas = std::make_unique<CanvasWidget> ();
     auto ptr_canvas = canvas.get();
     canvas->setAttribute(Qt::WA_DeleteOnClose);
+    canvas->setWindowTitle("未命名");
     auto w = ui->mdiArea->addSubWindow (canvas.release());
 
     w->setWindowState(Qt::WindowMaximized);
+
+
     return ptr_canvas;
 }
 

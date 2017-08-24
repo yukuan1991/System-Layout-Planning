@@ -292,7 +292,6 @@ AbstractLine *CanvasView::makeLine(not_null<AbstractItem *> p1, not_null<Abstrac
 
 void CanvasView::onSelectedChanged()
 {
-	qDebug() << "CanvasView::onSelectedChanged";
 	const auto items = scene_->selectedItems();
 	QList<AbstractItem*> selectedItems;
 	for(auto & it : items)
@@ -326,11 +325,15 @@ void CanvasView::operationUnitNameChanged(const QString& oldValue, const QString
 			}
 		}
 	}
+	scene_->update();
+
+	relationSetDlg_.operationUnitNameChanged(oldValue, newValue);
 }
 
 void CanvasView::operationUnitTypeChanged(const QString& oldValue, const QString& newValue)
 {
-
+	Q_UNUSED(oldValue);
+	Q_UNUSED(newValue);
 }
 
 QVariant CanvasView::cellMark(int col) const

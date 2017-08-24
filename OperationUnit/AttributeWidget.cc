@@ -77,5 +77,8 @@ void AttributeWidget::onButtonConfirmClicked()
     {
         emit operationUnitNameChanged(name_, name);
         emit operationUnitTypeChanged(type_, type);
+
+        name_ = name;
+        type_ = type;
     }
 }

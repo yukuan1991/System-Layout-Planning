@@ -17,6 +17,5 @@ MarkWidget::~MarkWidget()
 
 void MarkWidget::setMark(qreal mark)
 {
-    qDebug() << "MarkWidget::setMark:" << mark;
     ui->labelMark->setText(QString::number(mark));
 }
