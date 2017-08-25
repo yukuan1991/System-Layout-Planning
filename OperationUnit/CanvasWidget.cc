@@ -8,9 +8,6 @@ CanvasWidget::CanvasWidget(QWidget *parent) :
     ui->setupUi(this);
 
     initConn();
-//    auto markWidget = std::make_unique<MarkWidget>();
-//    auto ptr_markWidget = markWidget.get();
-//    ui->dockWidget->setWidget(markWidget.release());
 }
 
 CanvasWidget::~CanvasWidget()
@@ -18,9 +15,9 @@ CanvasWidget::~CanvasWidget()
     delete ui;
 }
 
-void CanvasWidget::relationSetDlgExec()
+void CanvasWidget::relationSetDlgExec(const QVariant& oldData)
 {
-    ui->canvasView->relationSetDlgExec();
+    ui->canvasView->relationSetDlgExec(oldData);
 }
 
 QVariant CanvasWidget::dump() const

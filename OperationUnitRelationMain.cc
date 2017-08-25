@@ -138,7 +138,8 @@ void OperationUnitRelationMain::relationSet()
     {
         return;
     }
-    w->relationSetDlgExec();
+    const auto data = w->dump();
+    w->relationSetDlgExec(data);
 }
 
 not_null<CanvasWidget*> OperationUnitRelationMain::createWindow()

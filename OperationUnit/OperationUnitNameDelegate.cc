@@ -50,10 +50,10 @@ void OperationUnitNameDelegate::setModelData(QWidget *editor, QAbstractItemModel
         auto row = model->rowCount();
         for(int i = 0; i < row; i++)
         {
-            if(edit->text() == model->data(model->index(i, 0)))
+            if(edit->text() == model->data(model->index(i, 0)) and edit->text() != "")
             {
                 QMessageBox::information(nullptr, "提示", "作业单位名称重复!");
-                model->setData(index, {});
+                return;
             }
         }
         model->setData(index, edit->text());

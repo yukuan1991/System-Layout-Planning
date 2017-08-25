@@ -26,9 +26,6 @@ void CanvasScene::drawBackground(QPainter *painter, const QRectF &rect)
     auto center_point = sceneRect().center();
     effective_rect_ = QRectF (center_point - QPointF (width_ / 2, height_ / 2), QSizeF (width_, height_));
     painter->drawRect(effective_rect_);
-//    auto mark = calculateMark();
-//    painter->drawText(effective_rect_.topRight() - QPointF(100, -15), "评估分值:");
-//    painter->drawText(effective_rect_.topRight() - QPointF(60, -30), QString::number(mark));
 }
 
 void CanvasScene::init()

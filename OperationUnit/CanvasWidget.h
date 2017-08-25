@@ -17,7 +17,7 @@ public:
     explicit CanvasWidget(QWidget *parent = 0);
     ~CanvasWidget();
 
-    void relationSetDlgExec();
+    void relationSetDlgExec(const QVariant& oldData);
     QVariant dump() const;
     bool load(const QVariant& data);
 

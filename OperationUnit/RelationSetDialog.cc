@@ -8,6 +8,8 @@
 #include "OperationUnit/OperationUnitNameDelegate.h"
 #include <base/lang/not_null.h>
 
+#include <QDebug>
+
 using std::make_unique;
 
 RelationSetDialog::RelationSetDialog(QWidget *parent) :
@@ -16,7 +18,7 @@ RelationSetDialog::RelationSetDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->lineEdit->setValidator(new QIntValidator(1, 999, this));
+    ui->lineEdit->setValidator(new QIntValidator(2, 999, this));
     initConn();
 }
 
@@ -55,14 +57,17 @@ QVariant RelationSetDialog::dump() const
         mark.push_back(markData + " " + sortData);
     }
 
-    const auto model = ui->operationUnitForm->model (); assert (model);
+    if (nameModel_ == null)
+    {
+        return {};
+    }
 
     QVariantList operationList;
-    for (auto row = 0; row < model->rowCount (); row ++)
+    for (auto row = 0; row < nameModel_->rowCount (); row ++)
     {
         QVariantMap map;
-        map ["name"] = model->data (model->index (row, 0), Qt::DisplayRole).toString ();
-        map ["type"] = model->data (model->index (row, 1), Qt::DisplayRole).toString ();
+        map ["name"] = nameModel_->data (nameModel_->index (row, 0), Qt::DisplayRole).toString ();
+        map ["type"] = nameModel_->data (nameModel_->index (row, 1), Qt::DisplayRole).toString ();
         operationList.append (map);
     }
 
@@ -83,24 +88,28 @@ bool RelationSetDialog::load(const QVariantMap &data)
     const auto rows = operation.size();
     if(rows <= 0)
     {
+        ui->tableWidget->setRowCount(0);
+        ui->tableWidget->setColumnCount(0);
+        ui->tableView->setModel(nullptr);
+        ui->operationUnitForm->setModel(nullptr);
+        ui->lineEdit->setText("");
         return false;
     }
     ui->lineEdit->setText(QString::number(rows));
     setTable(rows + 2, rows);
 
-    auto nameModel = ui->operationUnitForm->model();
     for(int row = 0; row < rows; row++)
     {
-        auto index = nameModel->index(row, 0);
+        auto index = nameModel_->index(row, 0);
         const auto name = operation.at(row).toMap()["name"].toString();
-        nameModel->setData(index, name);
+        nameModel_->setData(index, name);
     }
 
     for(int row = 0; row < rows; row++)
     {
-        auto index = nameModel->index(row, 1);
+        auto index = nameModel_->index(row, 1);
         const auto type = operation.at(row).toMap()["type"].toString();
-        nameModel->setData(index, type);
+        nameModel_->setData(index, type);
     }
 
     for(auto it : relation)
@@ -117,8 +126,10 @@ bool RelationSetDialog::load(const QVariantMap &data)
 
 void RelationSetDialog::setTable(int rows, int cols)
 {
-    model_ = make_unique<OperationUnitModel> (rows, cols, this);
-    delegate_ = make_unique<OperationUnitDelegate> (this);
+    if (model_ == null)
+        model_ = make_unique<OperationUnitModel> (rows, cols, this);
+    if (delegate_ == null)
+        delegate_ = make_unique<OperationUnitDelegate> (this);
 
     ui->tableView->setModel(model_.get ());
     ui->tableView->setItemDelegate(delegate_.get ());
@@ -150,7 +161,6 @@ void RelationSetDialog::setTable(int rows, int cols)
     model_->setHeaderData(rows - 1, Qt::Vertical, "排序");
     ui->tableView->verticalHeader()->setDefaultAlignment(Qt::AlignCenter);
 
-
     ui->tableWidget->setColumnCount(2);
     ui->tableWidget->setRowCount(6);
     QStringList horizontalHeader;
@@ -181,22 +191,26 @@ void RelationSetDialog::setTable(int rows, int cols)
 
     ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-    auto nameModel = std::make_unique<QStandardItemModel> (cols, 2, this);
-    nameModel->setHeaderData(0, Qt::Horizontal, "作业单位名称");
-    nameModel->setHeaderData(1, Qt::Horizontal, "作业单位工作性质");
+    if(nameModel_ == null)
+    {
+        nameModel_ = std::make_unique<QStandardItemModel> (cols, 2, this);
+    }
+
+    nameModel_->setHeaderData(0, Qt::Horizontal, "作业单位名称");
+    nameModel_->setHeaderData(1, Qt::Horizontal, "作业单位工作性质");
     for(int i = 0; i < cols; i++)
     {
         for(int j = 0; j < 2; j++)
         {
             auto item = std::make_unique<QStandardItem> ();
-            nameModel->setItem(i, j, item.release ());
-            nameModel->item(i, j)->setTextAlignment(Qt::AlignCenter);
+            nameModel_->setItem(i, j, item.release ());
+            nameModel_->item(i, j)->setTextAlignment(Qt::AlignCenter);
         }
     }
 
     nameDelegate_ = std::make_unique<OperationUnitNameDelegate> ();
 
-    ui->operationUnitForm->setModel(nameModel.release());
+    ui->operationUnitForm->setModel(nameModel_.get());
     ui->operationUnitForm->setItemDelegate(nameDelegate_.get());
     ui->operationUnitForm->setColumnWidth(1, 150);
 }
@@ -227,11 +241,14 @@ void RelationSetDialog::buttonModify()
     /// 很不优雅 QMessageBox::question
     if (model_ != null)
     {
-        auto ret = QMessageBox::question(this, "设置", "是否修改当前作业单位数？", "是", "否");
-        constexpr auto yes = 0;
-        if(ret != yes)
+        if (ui->tableWidget->rowCount() > 0)
         {
-            return;
+            auto ret = QMessageBox::question(this, "设置", "是否修改当前作业单位数？", "是", "否");
+            constexpr auto yes = 0;
+            if(ret != yes)
+            {
+                return;
+            }
         }
     }
 
@@ -271,14 +288,13 @@ bool RelationSetDialog::checkDataPadding()
     }
 
     ///判断作业单位信息表数据是否填充满
-    const auto nameModel = ui->operationUnitForm->model();
-    const auto nameRow = nameModel->rowCount();
-    const auto nameCol = nameModel->columnCount();
+    const auto nameRow = nameModel_->rowCount();
+    const auto nameCol = nameModel_->columnCount();
     for(int i = 0; i < nameRow; i++)
     {
         for(int j = 0; j < nameCol; j++)
         {
-            if(nameModel->data(nameModel->index(i, j)).toString().isEmpty())
+            if(nameModel_->data(nameModel_->index(i, j)).toString().isEmpty())
             {
                 return false;
             }
@@ -304,22 +320,20 @@ QVariant RelationSetDialog::cellRank(int col) const
 
 QVariant RelationSetDialog::cellType(int row) const
 {
-    const auto model = ui->operationUnitForm->model();
-    const auto index = model->index(row, 1);
-    return model->data(index, Qt::DisplayRole);
+    const auto index = nameModel_->index(row, 1);
+    return nameModel_->data(index, Qt::DisplayRole);
 }
 
 void RelationSetDialog::operationUnitNameChanged(const QString &oldValue, const QString &newValue)
 {
-    auto model = ui->operationUnitForm->model();
-    auto rows = model->rowCount();
+    auto rows = nameModel_->rowCount();
     for(int row = 0; row < rows; row++)
     {
-        const auto index = model->index(row, 0);
-        const auto name = model->data(index, Qt::DisplayRole).toString();
+        const auto index = nameModel_->index(row, 0);
+        const auto name = nameModel_->data(index, Qt::DisplayRole).toString();
         if(name == oldValue)
         {
-            model->setData(index, newValue, Qt::DisplayRole);
+            nameModel_->setData(index, newValue, Qt::DisplayRole);
         }
     }
 }

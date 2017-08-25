@@ -10,6 +10,7 @@ class RelationSetDialog;
 class OperationUnitDelegate;
 class OperationUnitModel;
 class OperationUnitNameDelegate;
+class QStandardItemModel;
 
 class RelationSetDialog : public QDialog
 {
@@ -36,6 +37,7 @@ private:
     std::unique_ptr<OperationUnitDelegate> delegate_;
     std::unique_ptr<OperationUnitModel> model_;
     std::unique_ptr<OperationUnitNameDelegate> nameDelegate_;
+    std::unique_ptr<QStandardItemModel> nameModel_;
 private:
     Ui::RelationSetDialog *ui;
 };

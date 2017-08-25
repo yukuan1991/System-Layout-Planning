@@ -33,10 +33,12 @@ CanvasView::~CanvasView()
 	disconnect (selection_conn_);
 }
 
-void CanvasView::relationSetDlgExec()
+void CanvasView::relationSetDlgExec(const QVariant& oldData)
 {
     if (QDialog::Accepted != relationSetDlg_.exec ())
     {
+		const auto data = oldData.toMap();
+		loadRelationSetDlg(data);
 		return;
 	}
 

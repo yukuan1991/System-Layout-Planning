@@ -41,7 +41,7 @@ public:
 
     ~CanvasView() override;
 
-    void relationSetDlgExec();
+    void relationSetDlgExec(const QVariant& oldData);
     qreal calculateMark() { return scene_->calculateMark(); }
     QVariant dump() const;
     bool load(const QVariant& data);
