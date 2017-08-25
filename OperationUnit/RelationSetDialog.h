@@ -15,7 +15,6 @@ class QStandardItemModel;
 class RelationSetDialog : public QDialog
 {
     Q_OBJECT
-
 public:
     explicit RelationSetDialog(QWidget *parent = 0);
     ~RelationSetDialog();

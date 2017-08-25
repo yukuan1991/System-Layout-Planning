@@ -91,6 +91,7 @@ bool RelationSetDialog::load(const QVariantMap &data)
         ui->tableWidget->setRowCount(0);
         ui->tableWidget->setColumnCount(0);
         ui->tableView->setModel(nullptr);
+        ui->tableView->setItemDelegate(nullptr);
         ui->operationUnitForm->setModel(nullptr);
         ui->lineEdit->setText("");
         return false;
@@ -126,10 +127,10 @@ bool RelationSetDialog::load(const QVariantMap &data)
 
 void RelationSetDialog::setTable(int rows, int cols)
 {
-    if (model_ == null)
-        model_ = make_unique<OperationUnitModel> (rows, cols, this);
-    if (delegate_ == null)
-        delegate_ = make_unique<OperationUnitDelegate> (this);
+//    if (model_ == null)
+    model_ = make_unique<OperationUnitModel> (rows, cols, this);
+    //    if (delegate_ == null)
+    delegate_ = make_unique<OperationUnitDelegate> (this);
 
     ui->tableView->setModel(model_.get ());
     ui->tableView->setItemDelegate(delegate_.get ());
@@ -191,10 +192,10 @@ void RelationSetDialog::setTable(int rows, int cols)
 
     ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-    if(nameModel_ == null)
-    {
+//    if(nameModel_ == null)
+//    {
         nameModel_ = std::make_unique<QStandardItemModel> (cols, 2, this);
-    }
+//    }
 
     nameModel_->setHeaderData(0, Qt::Horizontal, "作业单位名称");
     nameModel_->setHeaderData(1, Qt::Horizontal, "作业单位工作性质");
@@ -221,6 +222,8 @@ void RelationSetDialog::initConn()
 
     connect(ui->buttonConfirm, &QPushButton::clicked, this, &RelationSetDialog::buttonConfirm);
     connect(ui->buttonCancel, &QPushButton::clicked, this, &RelationSetDialog::reject);
+//    connect(this, &RelationSetDialog::buttonModifyClicked,
+//            [this] (const int num) { setTable(num + 2, num); });
 
 }
 
@@ -256,8 +259,14 @@ void RelationSetDialog::buttonModify()
     bool isOk = false;
     const auto num = text.toInt(&isOk);
 
+
     if(isOk)
     {
+//        ui->tableWidget->setRowCount(0);
+//        ui->tableWidget->setColumnCount(0);
+//        ui->tableView->setModel(nullptr);
+//        ui->tableView->setItemDelegate(nullptr);
+//        ui->operationUnitForm->setModel(nullptr);
         this->setTable(num + 2, num);
     }
 }

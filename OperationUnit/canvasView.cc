@@ -21,6 +21,8 @@
 #include <boost/range/adaptor/filtered.hpp>
 #include <boost/range/adaptor/transformed.hpp>
 #include <boost/range/algorithm/find_if.hpp>
+#include <base/lang/range.hpp>
+#include <QtMath>
 
 #include <QDebug>
 
@@ -116,22 +118,11 @@ void CanvasView::initConn()
 void CanvasView::generateChart(const QVariantMap & data)
 {
 	if(scene_->items().size() > 0)
-	{
-		const auto itemList = scene_->items();
-		auto itemRng = itemList
-		        | transformed([] (auto && c) { return dynamic_cast<AbstractItem *>(c); })
-		        | filtered([] (auto && c) { return c != nullptr; });
-		for(auto && item : itemRng)
-		{
-			item->deleteLater();
-		}
-		auto lineRng = itemList
-		        | transformed([] (auto && c) { return dynamic_cast<AbstractLine *>(c); })
-		        | filtered([] (auto && c) { return c != nullptr; });
-		for(auto && line : lineRng)
-		{
-			line->deleteLater();
-		}
+	{	
+		scene_->items ()
+		        | filtered ([] (auto && c) { return dynamic_cast<AbstractLine*> (c) != null or dynamic_cast<AbstractItem*> (c) != null; })
+		        | transformed ([] (auto && c) { return dynamic_cast<QGraphicsObject*> (c); })
+		        | execute ([] (auto && c) { c->deleteLater (); });
 	}
 
     const auto list = data ["operations"].toList ();
@@ -152,17 +143,40 @@ void CanvasView::generateChart(const QVariantMap & data)
 		makeLine (items[stringlist.at (0).toInt ()], items[stringlist.at (1).toInt ()], stringlist.at (2).toStdString ().at (0));
 	}
 
+	std::vector<AbstractItem*> vecItem;
 	const auto viewList = this->items ();
-	auto op = viewList
-	        | transformed ([] (auto && c) { return dynamic_cast<AbstractItem *>(c); })
-	        | filtered ([] (auto && c) { return c != null; });
-
-	auto pos = scene_->effectiveRect().center();
-
-	for(auto it : op)
+	for(auto & it : viewList)
 	{
-		it->setPos(pos);
+		auto item = dynamic_cast<AbstractItem*>(it);
+		if(item == nullptr)
+		{
+			continue;
+		}
+		vecItem.push_back(item);
 	}
+
+	const auto size = vecItem.size();
+	const auto rows = static_cast<int>(qSqrt(size)) + 1;
+	const auto cols = rows;
+
+	unsigned i = 0;
+	for(int row = 0; row < rows; row++)
+	{
+		for(int col = 0; col < cols; col++)
+		{
+			if(i < size)
+			{
+				auto pos = QPointF( 300 + row * 60, 150 + col * 60);
+				vecItem[i]->setPos(pos);
+				i++;
+			}
+		}
+	}
+//	auto pos = scene_->effectiveRect().center();
+//	viewList
+//	        | transformed ([] (auto && c) { return dynamic_cast<AbstractItem *>(c); })
+//	        | filtered ([] (auto && c) { return c != null; })
+//	        | execute ([&] (auto && c) { c->setPos (pos); size ++; });
 
 }
 

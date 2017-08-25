@@ -138,7 +138,9 @@ void OperationUnitRelationMain::relationSet()
     {
         return;
     }
+
     const auto data = w->dump();
+
     w->relationSetDlgExec(data);
 }
 

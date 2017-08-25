@@ -14,6 +14,7 @@
 #include <boost/range/adaptor/transformed.hpp>
 #include <boost/range/adaptor/filtered.hpp>
 #include <boost/range/numeric.hpp>
+#include <QDebug>
 
 using namespace boost;
 using namespace boost::adaptors;
