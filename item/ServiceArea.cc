@@ -17,7 +17,12 @@ void ServiceArea::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     int startAngle = 180 * 16;
     int spanAngle = -180 * 16;
 
-    painter->drawChord(boundingRect(), startAngle, spanAngle);
+    const auto topLeft = QPointF(boundingRect().topLeft().x(),
+                                 boundingRect().topLeft().y() + itemHeight / 4);
+    const auto bottomRight = QPointF(boundingRect().bottomRight().x(),
+                                boundingRect().bottomRight().y() + itemHeight / 4);
+    const auto paintRect = QRectF(topLeft, bottomRight);
+    painter->drawChord(paintRect, startAngle, spanAngle);
 
     if(objectName().isEmpty())
     {
