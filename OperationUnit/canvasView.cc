@@ -172,12 +172,6 @@ void CanvasView::generateChart(const QVariantMap & data)
 			}
 		}
 	}
-//	auto pos = scene_->effectiveRect().center();
-//	viewList
-//	        | transformed ([] (auto && c) { return dynamic_cast<AbstractItem *>(c); })
-//	        | filtered ([] (auto && c) { return c != null; })
-//	        | execute ([&] (auto && c) { c->setPos (pos); size ++; });
-
 }
 
 bool CanvasView::loadCanvas(const QVariantMap &data)
