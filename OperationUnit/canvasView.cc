@@ -351,18 +351,3 @@ void CanvasView::operationUnitTypeChanged(const QString& oldValue, const QString
 	Q_UNUSED(oldValue);
 	Q_UNUSED(newValue);
 }
-
-QVariant CanvasView::cellMark(int col) const
-{
-	return relationSetDlg_.cellMark(col);
-}
-
-QVariant CanvasView::cellRank(int col) const
-{
-	return relationSetDlg_.cellRank(col);
-}
-
-QVariant CanvasView::cellType(int row) const
-{
-	return relationSetDlg_.cellType(row);
-}

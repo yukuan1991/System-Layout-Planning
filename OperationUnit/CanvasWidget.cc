@@ -35,21 +35,6 @@ bool CanvasWidget::load(const QVariant& data)
     return true;
 }
 
-QVariant CanvasWidget::cellMark(int col) const
-{
-    return ui->canvasView->cellMark(col);
-}
-
-QVariant CanvasWidget::cellRank(int col) const
-{
-    return ui->canvasView->cellRank(col);
-}
-
-QVariant CanvasWidget::cellType(int row) const
-{
-    return ui->canvasView->cellType(row);
-}
-
 void CanvasWidget::initConn()
 {
 
