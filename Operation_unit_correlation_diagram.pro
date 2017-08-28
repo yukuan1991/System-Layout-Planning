@@ -11,7 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 CONFIG -= c++11
 QMAKE_CXXFLAGS += -std=c++1z
 
-TARGET = Operation_unit_correlation_diagram
+TARGET = SLP
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
