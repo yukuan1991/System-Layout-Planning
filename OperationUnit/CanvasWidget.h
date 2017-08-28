@@ -20,10 +20,6 @@ public:
     void relationSetDlgExec(const QVariant& oldData);
     QVariant dump() const;
     bool load(const QVariant& data);
-
-    QVariant cellMark(int col) const;
-    QVariant cellRank(int col) const;
-    QVariant cellType(int row) const;
 private:
     void initConn();
     void selectionChanaged(AbstractItem* item);

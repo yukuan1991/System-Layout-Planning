@@ -313,25 +313,6 @@ bool RelationSetDialog::checkDataPadding()
     return true;
 }
 
-QVariant RelationSetDialog::cellMark(int col) const
-{
-    const auto row = model_->columnCount();
-    const auto index = model_->index(row, col);
-    return model_->data(index, Qt::DisplayRole);
-}
-
-QVariant RelationSetDialog::cellRank(int col) const
-{
-    const auto row = model_->columnCount() + 1;
-    const auto index = model_->index(row, col);
-    return model_->data(index, Qt::DisplayRole);
-}
-
-QVariant RelationSetDialog::cellType(int row) const
-{
-    const auto index = nameModel_->index(row, 1);
-    return nameModel_->data(index, Qt::DisplayRole);
-}
 
 void RelationSetDialog::operationUnitNameChanged(const QString &oldValue, const QString &newValue)
 {
