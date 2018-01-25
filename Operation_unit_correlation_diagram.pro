@@ -54,7 +54,10 @@ SOURCES += main.cc\
     OperationUnit/OperationUnitModel.cc \
     OperationUnit/CanvasWidget.cc \
     OperationUnit/MarkWidget.cc \
-    OperationUnit/AttributeWidget.cc
+    OperationUnit/AttributeWidget.cc \
+    verification/des.cc \
+    verification/encryption.cc \
+    verification/verification.cpp
 
 HEADERS  += OperationUnitRelationMain.h \
     OperationUnit/Ribbon.h \
@@ -83,7 +86,11 @@ HEADERS  += OperationUnitRelationMain.h \
     OperationUnit/OperationUnitModel.h \
     OperationUnit/CanvasWidget.h \
     OperationUnit/MarkWidget.h \
-    OperationUnit/AttributeWidget.h
+    OperationUnit/AttributeWidget.h \
+    verification/des.h \
+    verification/encryption.h \
+    verification/json.hpp \
+    verification/verification.h
 
 FORMS    += operationunitrelationmain.ui \
     OperationUnit/operationunitrelationanalysis.ui \
@@ -94,7 +101,11 @@ FORMS    += operationunitrelationmain.ui \
 
 LIBS += -lboost_filesystem
 LIBS += -lboost_system
+LIBS += -lboost_regex
+LIBS += -lboost_thread
 LIBS += -lboost_locale
 LIBS += -liconv
+LIBS += -lwininet
+LIBS += -lws2_32
 
 DISTFILES +=

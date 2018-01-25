@@ -7,6 +7,8 @@
 #include <QStandardItemModel>
 #include <QStyleFactory>
 #include <QStyle>
+#include "verification/verification.h"
+#include <QTimer>
 
 
 void setStyle()
@@ -36,12 +38,23 @@ int main(int argc, char *argv[])
 {
 
     QApplication a(argc, argv);
+    if(!verification_process())
+    {
+        return -1;
+    }
+
     const auto fusion = QStyleFactory::create ("fusion");
     a.setStyle (fusion);
 
     setStyle();
     OperationUnitRelationMain w;
     w.show();
+
+    QTimer timer;
+    timer.setInterval (1000);
+    timer.setSingleShot (true);
+    QObject::connect (&timer, &QTimer::timeout, [&] { check_date (); timer.start (); });
+    timer.start ();
 
     return a.exec();
 }

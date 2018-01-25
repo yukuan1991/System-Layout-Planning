@@ -9,8 +9,8 @@ OperationUnitRibbon::OperationUnitRibbon(QWidget *parent)
 
         ButtonCell b;
 
-        b.add("关系设置", QPixmap("png/关系设置.png"), relationSet);
-        b.set_title("作业单位关系设置");
+        b.add("作业单位关系", QPixmap("png/关系设置.png"), relationSet);
+        b.set_title("属性设置");
 
         edit[0] = ::move (b);
         setupTab(edit, "设置");

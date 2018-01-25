@@ -16,6 +16,7 @@ OperationUnitRelationMain::OperationUnitRelationMain(QWidget *parent) :
     ui->mdiArea->setViewMode(QMdiArea::TabbedView);
     setWindowState(Qt::WindowMaximized);
     setEnabled();
+    setWindowTitle("Systematic Layout Planning");
 }
 
 OperationUnitRelationMain::~OperationUnitRelationMain()
